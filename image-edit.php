@@ -1,73 +1,18 @@
 <?php
 $fieldname = 'image';
+$config = array(
+);
 /*----*/
-$step = 1;
-#echo "<pre>\n"; var_dump($_SERVER); echo "</pre>\n"; exit;
+// DON'T use this as-is - it's not safe:
+$savepath = isset($_GET['s']) ? $_GET['s'] : '';
+$step     = 1;
 require 'ImageEdit.php';
-$imageEdit = new ImageEdit();
-$imageEdit->start($fieldname);
-if ($imageEdit->has_image) {
+$imageEdit = new ImageEdit($config);
+$imageEdit->run();
+$vals = $imageEdit->getValues();
+if ($vals['has_img']) {
 	$step = 2;
-	$vals = $imageEdit->getFormValues();
-	#echo "<pre>\n"; var_dump($vals); echo "</pre>\n"; exit;
 }
-/*
-if (! $_FILES['image_file']['error'] && $_FILES['image_file']['size'] < $max_size) {
-	if (is_uploaded_file($_FILES['image_file']['tmp_name'])) {
-
-		// new unique filename
-		$sTempFileName = 'cache/' . md5(time().rand());
-
-		// move uploaded file into cache folder
-		move_uploaded_file($_FILES['image_file']['tmp_name'], $sTempFileName);
-
-		// change file permission to 644
-		@chmod($sTempFileName, 0644);
-
-		if (file_exists($sTempFileName) && filesize($sTempFileName) > 0) {
-			$aSize = getimagesize($sTempFileName); // try to obtain image info
-			if (!$aSize) {
-				@unlink($sTempFileName);
-				return;
-			}
-
-			// check for image type
-			switch($aSize[2]) {
-				case IMAGETYPE_JPEG:
-					$sExt = '.jpg';
-
-					// create a new image from file
-					$vImg = @imagecreatefromjpeg($sTempFileName);
-					break;
-				case IMAGETYPE_PNG:
-					$sExt = '.png';
-
-					// create a new image from file
-					$vImg = @imagecreatefrompng($sTempFileName);
-					break;
-				default:
-					@unlink($sTempFileName);
-					return;
-			}
-
-			// create a new true color image
-			$vDstImg = @imagecreatetruecolor( $iWidth, $iHeight );
-
-			// copy and resize part of an image with resampling
-			imagecopyresampled($vDstImg, $vImg, 0, 0, (int)$_POST['x1'], (int)$_POST['y1'], $iWidth, $iHeight, (int)$_POST['w'], (int)$_POST['h']);
-
-			// define a result image filename
-			$sResultFileName = $sTempFileName . $sExt;
-
-			// output image to file
-			imagejpeg($vDstImg, $sResultFileName, $iJpgQuality);
-			@unlink($sTempFileName);
-
-			return $sResultFileName;
-		}
-	}
-}*/
-
 ?>
 <!DOCTYPE html>
 <head>
@@ -83,6 +28,11 @@ if (! $_FILES['image_file']['error'] && $_FILES['image_file']['size'] < $max_siz
 	<div class="row-fluid">
 		<?php if ($step == 1): ?>
 		<h1>Step 1: Choose image</h1>
+		<?php if(!empty($vals['errors'])): ?>
+		<?php foreach($vals['errors'] as $error): ?>
+		<p class="alert alert-error"><?php echo $error; ?></p>
+		<?php endforeach; ?>
+		<?php endif; ?>
 		<form id="upload_form" enctype="multipart/form-data" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 			<div class="fileupload fileupload-new" data-provides="fileupload">
 				<div class="fileupload-new thumbnail" style="width: 200px; height: 150px;"><img src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&text=no+image" /></div>
@@ -90,26 +40,30 @@ if (! $_FILES['image_file']['error'] && $_FILES['image_file']['size'] < $max_siz
 				<div>
 					<span class="btn btn-file"><span class="fileupload-new">Select image</span><span class="fileupload-exists">Change</span><input type="file" name="<?php echo $fieldname; ?>" id="fileinput" /></span>
 					<a href="#" class="btn fileupload-exists" data-dismiss="fileupload" id="remove">Remove</a>
-					<button type="submit" class="btn" id="next-btn">Next</button>
+					<button type="submit" class="btn" id="btn-next">Next</button>
 				</div>
 			</div>
 		</form>
 		<?php else: ?>
 		<h1>Step 2: Edit Image</h1>
 		<form id="edit_form" enctype="multipart/form-data" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-			<input type="hidden" value="<?php echo $vals['cache_id']; ?>" />
-			<input id="x" type="hidden" name="x">
-			<input id="y" type="hidden" name="y">
-			<input id="w" type="hidden" name="w">
-			<input id="h" type="hidden" name="h">
-			<input id="action" type="hidden" name="action">
+			<input type="hidden" id="cache_id" name="cache_id" value="<?php echo $vals['cache_id']; ?>" />
+			<input type="hidden" id="ext" name="ext" value="<?php echo $vals['ext']; ?>" />
+			<input type="hidden" id="max_version" name="max_version" value="<?php echo $vals['max_version']; ?>" />
+			<input type="hidden" id="savepath" name="savepath" value="<?php echo $savepath; ?>" />
+			<input type="hidden" id="version" name="version" value="<?php echo $vals['version']; ?>" />
+			<input type="hidden" id="x" name="x">
+			<input type="hidden" id="y" name="y">
+			<input type="hidden" id="w" name="w">
+			<input type="hidden" id="h" name="h">
+			<input type="hidden" id="action" name="action">
 			<div id="toolbar" class="control-group">
-			<button type="submit" class="btn btn-primary" data-action="undo"><i class="icon-undo"></i> Undo</button>
-			<button type="submit" class="btn btn-primary" data-action="redo"><i class="icon-redo"></i> Redo</button>
-			<button type="submit" class="btn btn-primary" data-action="anticlockwise"><i class="icon-anticlockwise"></i> Rotate Anticlockwise</button>
-			<button type="submit" class="btn btn-primary" data-action="clockwise"><i class="icon-clockwise"></i> Rotate Clockwise</button>
-			<button type="submit" class="btn btn-primary" data-action="crop"><i class="icon-crop"></i> Crop</button>
-			<button type="submit" class="btn btn-success" data-action="save"><i class="icon-save"></i> Save</button>
+				<button type="submit" class="btn btn-primary" id="btn-undo" data-action="undo"><i class="icon-undo"></i> Undo</button>
+				<button type="submit" class="btn btn-primary" id="btn-redo" data-action="redo"><i class="icon-redo"></i> Redo</button>
+				<button type="submit" class="btn btn-primary" id="btn-anticlockwise" data-action="anticlockwise"><i class="icon-anticlockwise"></i> Rotate Anticlockwise</button>
+				<button type="submit" class="btn btn-primary" id="btn-clockwise" data-action="clockwise"><i class="icon-clockwise"></i> Rotate Clockwise</button>
+				<button type="submit" class="btn btn-primary" id="btn-crop" data-action="crop"><i class="icon-crop"></i> Crop</button>
+				<button type="submit" class="btn btn-success" id="btn-save" data-action="save"><i class="icon-save"></i> Save</button>
 			</div>
 			<div><img src="<?php echo $vals['current_img']; ?>" id="editor" /></div>
 		</form>
@@ -119,6 +73,7 @@ if (! $_FILES['image_file']['error'] && $_FILES['image_file']['size'] < $max_siz
 <div class="container-fluid">
 	<div class="row-fluid">
 	<?php
+	echo "<pre>\n";var_dump($vals);echo "</pre>\n";
 	if (isset($_POST)) {
 		echo "<pre>\n"; var_dump($_POST); echo "</pre>\n";
 		if (isset($_FILES)) {
