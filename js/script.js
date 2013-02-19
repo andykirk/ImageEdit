@@ -34,8 +34,10 @@ $(function(){
 
 	$('#editor').Jcrop({
 		aspectRatio: 1,
+		boxWidth: 450,
+		boxHeight: 450,
 		onSelect: function(c){
-			$('#toolbar .btn:not(#btn-save)').prop('disabled', true);
+			$('#toolbar .btn').prop('disabled', true);
 			$('#btn-crop').prop('disabled', false);
 			$('#x').val(c.x);
 			$('#y').val(c.y);

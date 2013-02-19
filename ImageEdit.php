@@ -21,22 +21,29 @@ class ImageEdit {
 	public $lib_uri;
 	public $max_size;
 	public $max_version;
+	public $saved;
+	public $savepath;
+	public $savename;
 	public $types;
 	public $version;
 
 	public function __construct(array $config = array())
 	{
-		$this->cache_dir = 'cache';
-		$this->errors    = array();
-		$this->fieldname = 'image';
-		$this->max_size  = 200 * 1024;
-		$this->types     = array(
+		$this->cache_dir    = 'cache';
+		$this->errors       = array();
+		$this->fieldname    = 'image';
+		$this->max_size     = 200 * 1024;
+		$this->max_version  = 1;
+		$this->types        = array(
 	        'gif' => 'image/gif',
 	        'png' => 'image/png',
 	        'jpg' => 'image/jpeg'
         );
-		$this->version     = 1;
-		$this->max_version = 1;
+		$this->saved        = false;
+		$this->savepath     = false;
+		$this->savename     = false;
+		$this->version      = 1;
+
 
 		$lib_dir = explode('/', $_SERVER['PHP_SELF']);
 		array_pop($lib_dir);
@@ -58,18 +65,13 @@ class ImageEdit {
 	protected function buildCacheName($version)
 	{
 		return 'cache/' . $this->cache_id . '_' . $version . '.' . $this->ext;
-		#$this->cache_name  = $cache_name;
-		#$this->current_img = $this->lib_uri . $cache_name;
 	}
 
 	protected function buildImagePath($version)
 	{
 		return $this->lib_uri . $this->buildCacheName($version);
-		#$this->cache_name  = $cache_name;
-		#$this->current_img = $this->lib_uri . $cache_name;
 	}
 
-	#public function hasImage($fieldname)
 	protected function hasImage()
 	{
 		$this->has_img = false;
@@ -135,13 +137,46 @@ class ImageEdit {
 		return $f($img, $filename, $quality);
 	}
 
+	protected function filter($mode = '')
+	{
+		$version  = $this->version;
+		$new_file = $this->buildCacheName(++$version);
+		$source   = $this->imageCreateFromType($this->ext, $this->cache_name);
+		$ok       = true;
+
+		switch ($mode) {
+			case 'greyscale':
+				imagefilter($source, IMG_FILTER_GRAYSCALE);
+				break;
+			case 'sepia':
+				imagefilter($source, IMG_FILTER_GRAYSCALE);
+				imagefilter($source, IMG_FILTER_COLORIZE, 90, 60, 40);
+				break;
+			default:
+				break;
+		} // switch
+
+
+		if ($this->imageWrite($source, $this->ext, $new_file)) {
+			$this->version     = $version;
+			$this->max_version = $version;
+			$this->current_img = $this->buildImagePath($version);
+		} else {
+			$ok             = false;
+			$this->errors[] = 'Image greyscale filter failed.';
+		}
+		imagedestroy($source);
+		return $ok;
+	}
+
 	protected function rotate($degrees = 0)
 	{
 		$version  = $this->version;
 		$new_file = $this->buildCacheName(++$version);
 		$source   = $this->imageCreateFromType($this->ext, $this->cache_name);
-		$rotate   = imagerotate($source, $degrees, 0);
 		$ok       = true;
+		$rotate   = imagerotate($source, $degrees, 0);
+
 		if ($this->imageWrite($rotate, $this->ext, $new_file)) {
 			$this->version     = $version;
 			$this->max_version = $version;
@@ -161,7 +196,7 @@ class ImageEdit {
 		if ($has_img && isset($_POST['action'])) {
 			$action = 'action' . ucfirst($_POST['action']);
 			if (method_exists($this, $action)) {
-				$this->$action();
+				return $this->$action();
 			}
 		}
 	}
@@ -175,6 +210,7 @@ class ImageEdit {
 			'ext'         => $this->ext,
 			'has_img'     => $this->has_img,
 			'max_version' => $this->max_version,
+			'saved'       => $this->saved,
 			'version'     => $this->version
 		);
 
@@ -186,7 +222,9 @@ class ImageEdit {
 		if ($this->version > 1) {
 			$this->version--;
 			$this->current_img = $this->buildImagePath($this->version);
+			return true;
 		}
+		return false;
 	}
 
 	public function actionRedo()
@@ -195,7 +233,9 @@ class ImageEdit {
 		if ($this->version < $this->max_version) {
 			$this->version++;
 			$this->current_img = $this->buildImagePath($this->version);
+			return true;
 		}
+		return false;
 	}
 
 	public function actionAnticlockwise()
@@ -214,6 +254,7 @@ class ImageEdit {
 		$new_file = $this->buildCacheName(++$version);
 		$canvas   = imagecreatetruecolor($_POST['w'], $_POST['h']);
 		$piece    = $this->imageCreateFromType($this->ext, $this->cache_name);
+		$ok       = true;
 
 		imagecopyresampled(
 			$canvas, $piece,
@@ -221,7 +262,6 @@ class ImageEdit {
 			$_POST['w'], $_POST['h'], $_POST['w'], $_POST['h']
 		);
 
-		$ok       = true;
 		if ($this->imageWrite($canvas, $this->ext, $new_file)) {
 			$this->version     = $version;
 			$this->max_version = $version;
@@ -233,73 +273,34 @@ class ImageEdit {
 		imagedestroy($canvas);
 		imagedestroy($piece);
 		return $ok;
-
-		/*
-		   // The fixed image size (canvas):
-		   if (is_array($this->fixed_image)) {
-		   $fixed_w = $this->fixed_image[0];
-		   $fixed_h = $this->fixed_image[1];
-		   $scale_factor = $fixed_w / $this->new_w;
-		   $this->src_w = $this->orig_w;
-		   $this->src_h = $this->orig_h;
-		   $this->dst_w = round($this->src_w * $scale_factor);
-		   $this->dst_h = round($this->src_h * $scale_factor);
-		   $canvas_w = $fixed_w;
-		   $canvas_h = $fixed_h;
-		   } else {
-		   $this->src_w = $this->new_w;
-		   $this->src_h = $this->new_h;
-		   $this->dst_w = $this->new_w;
-		   $this->dst_h = $this->new_h;
-		   $canvas_w = $this->new_w;
-		   $canvas_h = $this->new_h;
-		   }
-
-		   $canvas = imagecreatetruecolor($canvas_w, $canvas_h);
-		   // $piece          = imagecreatefromjpeg($this->image_path);
-		   $piece = $this->_imageCreateFromType($this->image_path);
-		   $new_image_name = $this->_createImageName($this->session->Get('image_current') + 1);
-		   // bool imagecopyresampled(resource $dst_image, resource $src_image, int $dst_x, int $dst_y, int $src_x, int $src_y, int $dst_w, int $dst_h, int $src_w, int $src_h)
-		   imagecopyresampled($canvas, $piece, 0, 0, $this->src_x, $this->src_y, $this->dst_w, $this->dst_h, $this->src_w, $this->src_h);
-		   //if (imagejpeg($canvas, $this->image_cache_dir . $new_image_name, 100)) {
-		   if ($this->_writeImage($canvas, $this->image_cache_dir . $new_image_name, 100)) {
-		   $this->result .= '<p>Image crop successful!</p>' . "\n";
-		   #$src = $this->image_cache_dir . $new_image_name;
-		   $src = $this->image_cache_url . $new_image_name;
-		   $this->return_data['src'] = $src;
-		   #$dimensions = getimagesize($src);
-		   #$this->result .= '<img src="' . $src . '" alt="Test" ' . $dimensions[3] . '" />';
-		   } else {
-		   $this->result .= '<p>Image crop failed.</p>' . "\n";
-		   return false;
-		   }
-		   imagedestroy($canvas);
-		   imagedestroy($piece);
-		   return true;
-		   */
 	}
 
 	public function actionGreyscale()
 	{
-		/*// $source = imagecreatefromjpeg($image_cache.$new_image_name);
-		$source = $this->_imageCreateFromType($image_cache . $new_image_name);
-		//$source = imagerotate($source, 270, 0);
-		imagefilter($source, IMG_FILTER_grayscale);
-		$new_image_name = $this->_createImageName($this->session->Get('image_current') + 1);
-		// if(imagejpeg($source, $this->image_cache_dir.$new_image_name, 100))
-		if ($this->_imageType($source, $this->image_cache_dir . $new_image_name, 100)) {
-			$this->result .= '<p>Image grayscale successful!</p>' . "\n";
-			$src = $this->image_cache_url . $new_image_name;
-			$dimensions = getimagesize($src);
-			$this->result .= '<img src="' . $src . '" alt="Test" ' . $dimensions[3] . '" />';
-		} else {
-			$this->result .= '<p>Image grayscale failed.</p>' . "\n";
-		}
-		imagedestroy($source);*/
+		return $this->filter('greyscale');
+	}
+
+	public function actionSepia()
+	{
+		return $this->filter('sepia');
 	}
 
 	public function actionSave()
 	{
+		if (!$this->savepath) {
+			$this->errors[] = 'No save path was set in config.';
+			return false;
+		}
+		$savename = $this->savename
+			      ? $this->savename
+				  : $this->cache_id;
+		$new_filename = trim($this->savepath, '/') . '/' . $savename . '.' . $this->ext;
+		if (!copy($this->cache_name, $new_filename)) {
+			$this->errors[] = "Failed to copy $new_filename.";
+			return false;
+		}
+		$this->saved = true;
+		return true;
 	}
 
 	public function getFormatedSize($bytes) {
