@@ -24,7 +24,7 @@ class ImageEdit {
 		$this->max_size  = 200 * 1024;
 
 		$lib_dir = explode('/', $_SERVER['PHP_SELF']);
-		array_pop(array_pop($lib_dir));
+		array_pop($lib_dir);
 		$this->lib_uri = implode('/', $lib_dir) . '/';
 
 		foreach ($config as $key=>$val) {
@@ -55,7 +55,7 @@ class ImageEdit {
 		/*if (!is_null($this->has_image))	 {
 			return $this->has_image;
 		}*/
-		if (!$_FILES[$fieldname]['error'] && $_FILES[$fieldname]['size'] < $this->max_size) {
+		if (isset($_FILES[$fieldname]) && !$_FILES[$fieldname]['error'] && $_FILES[$fieldname]['size'] < $this->max_size) {
 			if (is_uploaded_file($_FILES[$fieldname]['tmp_name'])) {
 				$this->has_image = true;
 				return true;

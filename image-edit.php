@@ -76,7 +76,7 @@ if (! $_FILES['image_file']['error'] && $_FILES['image_file']['size'] < $max_siz
 <link rel="stylesheet" href="css/bootstrap.min.css">
 <link rel="stylesheet" href="css/bootstrap-jasny.min.css">
 <link rel="stylesheet" href="css/jquery.Jcrop.min.css">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.min.css">
 </head>
 <body>
 <div class="container-fluid">
@@ -88,9 +88,9 @@ if (! $_FILES['image_file']['error'] && $_FILES['image_file']['size'] < $max_siz
 				<div class="fileupload-new thumbnail" style="width: 200px; height: 150px;"><img src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&text=no+image" /></div>
 				<div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
 				<div>
-					<span class="btn btn-file"><span class="fileupload-new">Select image</span><span class="fileupload-exists">Change</span><input type="file" name="<?php echo $fieldname; ?>" /></span>
-					<a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>
-					<button type="submit" class="btn">Next</button>
+					<span class="btn btn-file"><span class="fileupload-new">Select image</span><span class="fileupload-exists">Change</span><input type="file" name="<?php echo $fieldname; ?>" id="fileinput" /></span>
+					<a href="#" class="btn fileupload-exists" data-dismiss="fileupload" id="remove">Remove</a>
+					<button type="submit" class="btn" id="next-btn">Next</button>
 				</div>
 			</div>
 		</form>
@@ -104,11 +104,12 @@ if (! $_FILES['image_file']['error'] && $_FILES['image_file']['size'] < $max_siz
 			<input id="h" type="hidden" name="h">
 			<input id="action" type="hidden" name="action">
 			<div id="toolbar" class="control-group">
-			<button type="submit" class="btn btn-primary" data-action="undo"><i class="icon-share-alt icon-white icon-flipped"></i> Undo</button>
-			<button type="submit" class="btn btn-primary" data-action="redo"><i class="icon-share-alt icon-white"></i> Redo</button>
-			<button type="submit" class="btn btn-primary" data-action="anticlockwise"><i class="icon-repeat icon-white icon-flipped"></i> Rotate Anticlockwise</button>
-			<button type="submit" class="btn btn-primary" data-action="clockwise"><i class="icon-repeat icon-white"></i> Rotate Clockwise</button>
-			<button type="submit" class="btn btn-primary" data-action="crop"><i class="icon-retweet icon-white"></i> Crop</button>
+			<button type="submit" class="btn btn-primary" data-action="undo"><i class="icon-undo"></i> Undo</button>
+			<button type="submit" class="btn btn-primary" data-action="redo"><i class="icon-redo"></i> Redo</button>
+			<button type="submit" class="btn btn-primary" data-action="anticlockwise"><i class="icon-anticlockwise"></i> Rotate Anticlockwise</button>
+			<button type="submit" class="btn btn-primary" data-action="clockwise"><i class="icon-clockwise"></i> Rotate Clockwise</button>
+			<button type="submit" class="btn btn-primary" data-action="crop"><i class="icon-crop"></i> Crop</button>
+			<button type="submit" class="btn btn-success" data-action="save"><i class="icon-save"></i> Save</button>
 			</div>
 			<div><img src="<?php echo $vals['current_img']; ?>" id="editor" /></div>
 		</form>

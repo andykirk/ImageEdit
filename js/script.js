@@ -1,4 +1,9 @@
 $(function(){
+	$('#next-btn').prop('disabled', true);
+	$('#fileinput').change(function(){
+		$('#next-btn').prop('disabled', function (_, val) { return ! val; });
+	});
+
 	$('#editor').Jcrop();
 
 	/*$('#edit_form').submit(function(e){
