@@ -1,3 +1,4 @@
+/* Image Editor Font */
 @font-face {
 	font-family: 'ImageEditorFont';
 	src:url('font/ImageEditorFont.eot');
@@ -27,7 +28,7 @@ you can use the generic selector below, but it's slower:
 */
 [class*="icon-"] {
     font-style: inherit;
-    font-weight: normal;;
+    font-weight: normal;
   }
 .icon-anticlockwise:before, .icon-clockwise:before, .icon-undo:before, .icon-redo:before, .icon-crop:before, .icon-save:before, .icon-greyscale:before {
 	font-family: 'ImageEditorFont';
