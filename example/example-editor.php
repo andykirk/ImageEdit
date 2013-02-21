@@ -1,7 +1,7 @@
 <?php
 $fieldname = 'image';
-$savepath = false;
-#$savepath = $_SERVER['DOCUMENT_ROOT'] . '/images/avatars';
+#$savepath = false;
+$savepath = $_SERVER['DOCUMENT_ROOT'] . '/images/avatars';
 $savename = isset($_GET['savename']) ? $_GET['savename'] : '';
 if (empty($savename)) {
 	$savename = isset($_POST['savename']) ? $_POST['savename'] : '';
@@ -97,7 +97,7 @@ if ($vals['saved']) {
 		</form>
 		<?php elseif ($step == 3): ?>
 		<h1>Step 3: Done!</h1>
-		<p class="alert alert-success">Image successfully saved. All done!<br />(well if this were a real application...)</p>
+		<p class="alert alert-success">Image successfully saved. All done!</p>
 		<div class="btn-toolbar">
 			<a href="example-editor.php" class="btn">Start again</a>
 		</div>
