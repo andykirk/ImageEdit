@@ -11,7 +11,7 @@ $config = array(
 );
 /*----*/
 
-$step     = 1;
+$step = 1;
 require 'ImageEdit.php';
 $imageEdit = new ImageEdit($config);
 $imageEdit->run();

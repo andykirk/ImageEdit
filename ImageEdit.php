@@ -10,6 +10,7 @@
  * @access public
  */
 class ImageEdit {
+	public $allow_save;
 	public $cache_dir;
 	public $cache_id;
 	public $cache_name;
@@ -29,6 +30,7 @@ class ImageEdit {
 
 	public function __construct(array $config = array())
 	{
+		$this->allow_save   = true;
 		$this->cache_dir    = 'cache';
 		$this->errors       = array();
 		$this->fieldname    = 'image';
@@ -77,11 +79,10 @@ class ImageEdit {
 		$this->has_img = false;
 		$fieldname     = $this->fieldname;
 		// Check for posted values:
-		#echo "<pre>\n";var_dump($_POST);echo "</pre>\n";exit;
 		if (isset($_POST['cache_id'])
-		 && isset($_POST['ext'])
-		 && isset($_POST['version'])
-		 && isset($_POST['max_version'])) {
+			&& isset($_POST['ext'])
+			&& isset($_POST['version'])
+		&& isset($_POST['max_version'])) {
 			$this->cache_id    = $_POST['cache_id'];
 			$this->ext         = $_POST['ext'];
 			$this->version     = $_POST['version'];
@@ -100,8 +101,8 @@ class ImageEdit {
 			return false;
 		}
 		if (!$_FILES[$fieldname]['error']
-		  && $_FILES[$fieldname]['size'] < $this->max_size
-		  && in_array($_FILES[$fieldname]['type'], $this->types)) {
+			&& $_FILES[$fieldname]['size'] < $this->max_size
+		&& in_array($_FILES[$fieldname]['type'], $this->types)) {
 			if (is_uploaded_file($_FILES[$fieldname]['tmp_name'])) {
 				$this->has_img     = true;
 				$name              = $_FILES[$fieldname]['name'];
@@ -130,11 +131,18 @@ class ImageEdit {
 
 	protected function imageWrite($img, $type, $filename, $quality = 100)
 	{
-		if ($type == 'jpg') {
-			$type = 'jpeg';
-		}
-		$f = 'image' . $type;
-		return $f($img, $filename, $quality);
+		switch ($type) {
+			case 'jpg':
+				$r = imagejpeg($new_img, $dest_file, $quality);
+				break;
+			case 'png':
+				$r = imagepng($new_img, $dest_file);
+				break;
+			case 'gif':
+				$r = imagegif($new_img, $dest_file);
+				break;
+		} // switch
+		return $r;
 	}
 
 	protected function filter($mode = '')
@@ -287,6 +295,9 @@ class ImageEdit {
 
 	public function actionSave()
 	{
+		if (!$this->allow_save) {
+			return true;
+		}
 		if (!$this->savepath) {
 			$this->errors[] = 'No save path was set in config.';
 			return false;
@@ -294,9 +305,19 @@ class ImageEdit {
 		$savename = $this->savename
 			      ? $this->savename
 				  : $this->cache_id;
-		$new_filename = trim($this->savepath, '/') . '/' . $savename . '.' . $this->ext;
+		$savepath = trim(rtrim($this->savepath, '/')) . '/';
+		if (!file_exists($savepath) || !is_dir($savepath)) {
+			$this->errors[] = "Folder $savepath does not exist.";
+			return false;
+		}
+		if (!is_writable($savepath)) {
+			$this->errors[] = "Folder $savepath is not writable. Folder permissions: " . substr(sprintf('%o', fileperms($savepath)), -4) . '.';
+			return false;
+		}
+		$new_filename = $savepath . $savename . '.' . $this->ext;
+
 		if (!copy($this->cache_name, $new_filename)) {
-			$this->errors[] = "Failed to copy $new_filename.";
+			$this->errors[] = "Failed to copy $new_filename from $this->cache_name.";
 			return false;
 		}
 		$this->saved = true;
