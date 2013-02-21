@@ -8,4 +8,4 @@ The editor could be used as a standalone page, embedded as part of a page or for
 
 The standalone example code provided in this repo should be enough to give you an idea of how to get this up and running.
 
-Checkout a [demo](http://www.grudlight-design.co.uk/demos/ImageEdit/) of this in use in a modal.
+Checkout a [demo](http://www.gridlight-design.co.uk/demos/ImageEdit/) of this in use in a modal.
