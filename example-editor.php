@@ -78,7 +78,7 @@ if ($vals['saved']) {
 					<button type="submit" class="btn btn-primary btn-small" id="btn-redo" data-action="redo"><i class="icon-redo"></i> Redo</button>
 				</div>
 				<div class="btn-group btn-toolbar">
-					<button type="submit" class="btn btn-primary btn-small btn-small" id="btn-anticlockwise" data-action="anticlockwise"><i class="icon-anticlockwise"></i> Rotate Anticlockwise</button>
+					<button type="submit" class="btn btn-primary btn-small" id="btn-anticlockwise" data-action="anticlockwise"><i class="icon-anticlockwise"></i> Rotate Anticlockwise</button>
 					<button type="submit" class="btn btn-primary btn-small" id="btn-clockwise" data-action="clockwise"><i class="icon-clockwise"></i> Rotate Clockwise</button>
 				</div>
 				<div class="btn-group btn-toolbar">
