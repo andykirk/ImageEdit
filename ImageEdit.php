@@ -72,6 +72,16 @@ class ImageEdit {
 		return $this->lib_uri . $this->buildCacheName($version);
 	}
 
+	/*protected function clearCache()
+	{
+		foreach (scandir('cache') as $file) {
+			echo "<pre>\n";var_dump($file);echo "</pre>\n";
+			if (strpos($file, $this->cache_id) !== false) {
+				unlink('cache' . DIRECTORY_SEPARATOR . $file);
+			}
+		}
+	}*/
+
 	protected function hasImage()
 	{
 		$this->has_img = false;
@@ -294,6 +304,9 @@ class ImageEdit {
 	public function actionSave()
 	{
 		if (!$this->savepath) {
+			// Clearing the cache means that the final image can't be displayed,
+			// so not sure what to do about this yet.
+			#$this->clearCache();
 			$this->saved = true;
 			return true;
 		}
