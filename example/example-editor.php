@@ -1,6 +1,7 @@
 <?php
 $fieldname = 'image';
-$savepath = $_SERVER['DOCUMENT_ROOT'] . '/images/avatars';
+$savepath = false;
+#$savepath = $_SERVER['DOCUMENT_ROOT'] . '/images/avatars';
 $savename = isset($_GET['savename']) ? $_GET['savename'] : '';
 if (empty($savename)) {
 	$savename = isset($_POST['savename']) ? $_POST['savename'] : '';
@@ -12,7 +13,7 @@ $config = array(
 /*----*/
 
 $step = 1;
-require 'ImageEdit.php';
+require '../ImageEdit.php';
 $imageEdit = new ImageEdit($config);
 $imageEdit->run();
 $vals = $imageEdit->getValues();
@@ -96,7 +97,8 @@ if ($vals['saved']) {
 		</form>
 		<?php elseif ($step == 3): ?>
 		<h1>Step 3: Done!</h1>
-		<p class="alert alert-success">Image successfully saved. All done!</p>
+		<p class="alert alert-success">Image successfully saved. All done!<br />(well if this were a real application...)</p>
+		<div><img src="<?php echo $vals['current_img']; ?>" id="editor" /></div>
 		<?php endif; ?>
 	</div>
 </div>

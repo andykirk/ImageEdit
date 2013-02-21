@@ -17,9 +17,9 @@ $(function(){
 		// Turn them all on to start:
 		$('#toolbar .btn').prop('disabled', false);
 		// If image isn't square, disallow save:
-		if ($('#editor').width() != $('#editor').height()) {
+		/*if ($('#editor').width() != $('#editor').height()) {
 			$('#btn-save').prop('disabled', true);
-		}
+		}*/
 		// Disable undo if at histroy start:
 		if ($('#version').val() == 1) {
 			$('#btn-undo').prop('disabled', true);

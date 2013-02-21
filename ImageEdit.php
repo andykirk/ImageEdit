@@ -10,7 +10,6 @@
  * @access public
  */
 class ImageEdit {
-	public $allow_save;
 	public $cache_dir;
 	public $cache_id;
 	public $cache_name;
@@ -30,7 +29,6 @@ class ImageEdit {
 
 	public function __construct(array $config = array())
 	{
-		$this->allow_save   = true;
 		$this->cache_dir    = 'cache';
 		$this->errors       = array();
 		$this->fieldname    = 'image';
@@ -129,7 +127,7 @@ class ImageEdit {
 		return $f($filename);
 	}
 
-	protected function imageWrite($img, $type, $filename, $quality = 100)
+	protected function imageWrite($new_img, $type, $dest_file, $quality = 100)
 	{
 		switch ($type) {
 			case 'jpg':
@@ -295,7 +293,8 @@ class ImageEdit {
 
 	public function actionSave()
 	{
-		if (!$this->allow_save) {
+		if (!$this->savepath) {
+			$this->saved = true;
 			return true;
 		}
 		if (!$this->savepath) {
