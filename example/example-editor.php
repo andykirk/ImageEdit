@@ -98,7 +98,10 @@ if ($vals['saved']) {
 		<?php elseif ($step == 3): ?>
 		<h1>Step 3: Done!</h1>
 		<p class="alert alert-success">Image successfully saved. All done!<br />(well if this were a real application...)</p>
-		<div><img src="<?php echo $vals['current_img']; ?>" id="editor" /></div>
+		<div class="btn-toolbar">
+			<a href="example-editor.php" class="btn">Start again</a>
+		</div>
+		<div><img src="<?php echo $vals['current_img']; ?>" /></div>
 		<?php endif; ?>
 	</div>
 </div>

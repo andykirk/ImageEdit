@@ -150,6 +150,7 @@ class ImageEdit {
 				$r = imagegif($new_img, $dest_file);
 				break;
 		} // switch
+		chmod($dest_file, 0777);
 		return $r;
 	}
 
