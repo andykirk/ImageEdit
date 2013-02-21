@@ -102,21 +102,6 @@ if ($vals['saved']) {
 		<?php endif; ?>
 	</div>
 </div>
-<?php /*
-<div class="container-fluid">
-	<div class="row-fluid">
-	<?php
-	echo "<pre>\n";var_dump($vals);echo "</pre>\n";
-	if (isset($_POST)) {
-		echo "<pre>\n"; var_dump($_POST); echo "</pre>\n";
-		if (isset($_FILES)) {
-			echo "<pre>\n"; var_dump($_FILES); echo "</pre>\n";
-		}
-	}
-	?>
-	</div>
-</div>
-*/ ?>
 <script src="js/jquery.min.js"></script>
 <script src="js/jquery.Jcrop.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
