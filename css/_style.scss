@@ -1,0 +1,71 @@
+/* Image Editor Font */
+@font-face {
+	font-family: 'ImageEditorFont';
+	src:url('font/ImageEditorFont.eot');
+	src:url('font/ImageEditorFont.eot?#iefix') format('embedded-opentype'),
+		url('font/ImageEditorFont.woff') format('woff'),
+		url('font/ImageEditorFont.ttf') format('truetype'),
+		url('font/ImageEditorFont.svg#ImageEditorFont') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+/* Use the following CSS code if you want to use data attributes for inserting your icons */
+/*[data-icon]:before {
+	font-family: 'ImageEditorFont';
+	content: attr(data-icon);
+	speak: none;
+	font-weight: normal;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+}*/
+
+/* Use the following CSS code if you want to have a class per icon */
+/*
+Instead of a list of all class selectors,
+you can use the generic selector below, but it's slower:
+[class*="icon-"]:before {
+*/
+[class*="icon-"] {
+    font-style: inherit;
+    font-weight: normal;
+  }
+.icon-anticlockwise:before, .icon-clockwise:before, .icon-undo:before, .icon-redo:before, .icon-crop:before, .icon-save:before, .icon-greyscale:before {
+	font-family: 'ImageEditorFont';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+
+	/*
+	font-family: IconicFill;
+    font-size: 0.9em;
+    vertical-align: middle;
+    display: inline-block;
+    content: "";
+    width: 1em;
+    text-align: center;
+    */
+}
+.icon-anticlockwise:before {
+	content: "\e000";
+}
+.icon-clockwise:before {
+	content: "\e001";
+}
+.icon-undo:before {
+	content: "\e002";
+}
+.icon-redo:before {
+	content: "\e003";
+}
+.icon-crop:before {
+	content: "\e004";
+}
+.icon-save:before {
+	content: "\e005";
+}
+.icon-greyscale:before {
+	content: "\e006";
+}
